@@ -58,6 +58,10 @@ package com.example;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.checkerframework.common.returnsreceiver.qual.This;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -75,14 +79,101 @@ public class App {
         this.cs3Path = cs3Path;
     }
 
+    // public void mergeData() throws IOException {
+    // Workbook cs1Workbook = new XSSFWorkbook(new FileInputStream(cs1Path));
+    // List<CS1Data> cs1DataList = readCS1Data(cs1Workbook);
+    // List<CS2Data> cs2DataList = readCS2Data(new XSSFWorkbook(new
+    // FileInputStream(cs2Path)));
+    // List<CS3Data> cs3DataList = readCS3Data(new XSSFWorkbook(new
+    // FileInputStream(cs3Path)));
+
+    // ListMultimap<String, CS2Data> cs2DataMap = ArrayListMultimap.create();
+    // for (CS2Data data : cs2DataList) {
+    // cs2DataMap.put(data.getVmName(), data);
+    // }
+
+    // // Create map for CS2 and CS3 data for easier searching
+    // // Map<String, CS2Data> cs2DataMap = new HashMap<>();
+    // // for (CS2Data data : cs2DataList) {
+    // // cs2DataMap.put(data.getVmName(), data);
+    // // }
+
+    // Map<Integer, CS3Data> cs3DataMap = new HashMap<>();
+    // for (CS3Data data : cs3DataList) {
+    // cs3DataMap.put(data.getTechnicalAssetId(), data);
+    // }
+
+    // // // Add new columns to CS1
+    // // Sheet cs1Sheet = cs1Workbook.getSheetAt(0);
+    // // Row row = cs1Sheet.getRow(0);
+    // // int lastCellNum = row.getLastCellNum();
+    // // row.createCell(lastCellNum).setCellValue("Owner Name");
+    // // row.createCell(lastCellNum + 1).setCellValue("Service Id");
+    // // row.createCell(lastCellNum + 2).setCellValue("Program Id");
+    // // row.createCell(lastCellNum + 3).setCellValue("Program Name");
+
+    // // Fill new columns in CS1
+    // // for (CS1Data cs1Data : cs1DataList) {
+    // // CS2Data cs2Data = cs2DataMap.get(cs1Data.getServerName());
+    // // if (cs2Data != null) {
+    // // CS3Data cs3Data = cs3DataMap.get(cs2Data.getTechnicalAssetId());
+    // // if (cs3Data != null) {
+    // // int rowIndex = cs1Data.getRowIndex();
+    // // row = cs1Sheet.getRow(rowIndex);
+    // // row.createCell(lastCellNum).setCellValue(cs3Data.getOwnerName());
+    // // row.createCell(lastCellNum +
+    // // 1).setCellValue(cs3Data.getServiceId().toString());
+    // // row.createCell(lastCellNum +
+    // // 2).setCellValue(cs3Data.getProgramId().toString());
+    // // row.createCell(lastCellNum + 3).setCellValue(cs3Data.getProgramName());
+    // // System.out.println("Added item to CS1");
+    // // }
+    // // }
+    // // }
+
+    // for (CS1Data cs1Data : cs1DataList) {
+    // List<CS2Data> matchingCS2Data = cs2DataMap.get(cs1Data.getServerName());
+    // for (CS2Data cs2Data : matchingCS2Data) {
+    // CS3Data cs3Data = cs3DataMap.get(cs2Data.getTechnicalAssetId());
+    // if (cs3Data != null) {
+    // int rowIndex = cs1Data.getRowIndex();
+    // row = cs1Sheet.getRow(rowIndex);
+    // row.createCell(lastCellNum).setCellValue(cs3Data.getOwnerName());
+    // row.createCell(lastCellNum +
+    // 1).setCellValue(cs3Data.getServiceId().toString());
+    // row.createCell(lastCellNum +
+    // 2).setCellValue(cs3Data.getProgramId().toString());
+    // row.createCell(lastCellNum + 3).setCellValue(cs3Data.getProgramName());
+    // System.out.println("Added item to CS1");
+    // // Add new row for each extra product
+    // rowIndex++;
+    // Row newRow = cs1Sheet.createRow(rowIndex);
+    // newRow.createCell(0).setCellValue(cs1Data.getServerName());
+    // newRow.createCell(1).setCellValue(cs1Data.getLabels());
+    // newRow.createCell(lastCellNum).setCellValue(cs3Data.getOwnerName());
+    // newRow.createCell(lastCellNum +
+    // 1).setCellValue(cs3Data.getServiceId().toString());
+    // newRow.createCell(lastCellNum +
+    // 2).setCellValue(cs3Data.getProgramId().toString());
+    // newRow.createCell(lastCellNum + 3).setCellValue(cs3Data.getProgramName());
+    // }
+    // }
+    // }
+    // // Write changes to CS1
+    // try (FileOutputStream fileOut = new FileOutputStream(cs1Path)) {
+    // cs1Workbook.write(fileOut);
+    // System.out.println("Success");
+    // }
+
+    // cs1Workbook.close();
+    // }
     public void mergeData() throws IOException {
         Workbook cs1Workbook = new XSSFWorkbook(new FileInputStream(cs1Path));
         List<CS1Data> cs1DataList = readCS1Data(cs1Workbook);
         List<CS2Data> cs2DataList = readCS2Data(new XSSFWorkbook(new FileInputStream(cs2Path)));
         List<CS3Data> cs3DataList = readCS3Data(new XSSFWorkbook(new FileInputStream(cs3Path)));
 
-        // Create map for CS2 and CS3 data for easier searching
-        Map<String, CS2Data> cs2DataMap = new HashMap<>();
+        ListMultimap<String, CS2Data> cs2DataMap = ArrayListMultimap.create();
         for (CS2Data data : cs2DataList) {
             cs2DataMap.put(data.getVmName(), data);
         }
@@ -103,12 +194,14 @@ public class App {
 
         // Fill new columns in CS1
         for (CS1Data cs1Data : cs1DataList) {
-            CS2Data cs2Data = cs2DataMap.get(cs1Data.getServerName());
-            if (cs2Data != null) {
+            List<CS2Data> matchingCS2Data = cs2DataMap.get(cs1Data.getServerName());
+            for (CS2Data cs2Data : matchingCS2Data) {
                 CS3Data cs3Data = cs3DataMap.get(cs2Data.getTechnicalAssetId());
                 if (cs3Data != null) {
                     int rowIndex = cs1Data.getRowIndex();
-                    row = cs1Sheet.getRow(rowIndex);
+                    row = cs1Sheet.createRow(rowIndex);
+                    row.createCell(0).setCellValue(cs1Data.getServerName());
+                    row.createCell(1).setCellValue(cs1Data.getLabels());
                     row.createCell(lastCellNum).setCellValue(cs3Data.getOwnerName());
                     row.createCell(lastCellNum + 1).setCellValue(cs3Data.getServiceId().toString());
                     row.createCell(lastCellNum + 2).setCellValue(cs3Data.getProgramId().toString());
@@ -121,7 +214,7 @@ public class App {
         // Write changes to CS1
         try (FileOutputStream fileOut = new FileOutputStream(cs1Path)) {
             cs1Workbook.write(fileOut);
-            System.out.println("Success");
+            System.out.println("Successfully");
         }
 
         cs1Workbook.close();
