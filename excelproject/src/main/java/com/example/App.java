@@ -136,5 +136,15 @@ public class App {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // if (args.length != 3) {
+        // System.err.println("Please provide paths to CS1, CS2, and CS3 files as
+        // arguments.");
+        // System.exit(1);
+        // }
+        // try {
+        // new App(args[0], args[1], args[2]).mergeData();
+        // } catch (IOException e) {
+        // e.printStackTrace();
+        // }
     }
 }
